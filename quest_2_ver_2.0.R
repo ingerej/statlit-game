@@ -6,7 +6,21 @@ library(shinythemes)
 #use navigation barns to set the 3-5 questions together
 #here I need both a grading of the right answear, with a and b getting somewhat right, but not completely
 
-ui <- fluidPage(theme = shinytheme("yeti"),
+ui <- fluidPage(tags$head(
+  tags$style(HTML("
+  body, label, input, button, select {
+      font-family: 'Times New Roman', serif;
+  }
+  
+  h1, h2, h3, h4 {
+      font-family: 'Times New Roman', serif;
+    }
+    
+    .shiny-input-radiogroup label {
+      font-size: 14px;
+    }
+  "))
+), theme = shinytheme("yeti"),
                 navbarPage("Bli en ekspert på statistikkyndighet <3",
                            
                            tabPanel("Spørsmål x", #change when setting the question-packages
@@ -14,18 +28,19 @@ ui <- fluidPage(theme = shinytheme("yeti"),
                                     sidebarLayout(
                                       
                                       sidebarPanel(
-                                        h3("Deskriptiv statistikk"),
-                                        h1("tolk sannsynlighet i kontekst"),
+                                        h5("Deskriptiv statistikk"),
+                                        h3("Tolk sannsynlighet i kontekst"),
                                         p("Ifølge det nasjonale  kreftinstituttet i USA er sannsynligheten for å utvikle prostatakreft i løpet av livet .15 for amerikanske menn. Hva betyr sannsynligheten .15 i dette tilfellet?")
                                       ), #sidebarlayout
                                       
                                       
                                       mainPanel(
-                                        h3("svaralternativer"), 
+                                        h2("Svaralternativer"), 
                                         
+                                        tags$div(style = "font-size: 50px;",
                                         radioButtons(
                                           inputId = "svar",
-                                          label = "Velg et alternativ:",
+                                          label = tags$h3("Velg et alternativ:"),
                                           choices = list(
                                             "For alle menn som lever i USA vil tilnærmet 15% av dem utvikle prostatakreft i løpet av livet" = "a",
                                             "Hvis man tilfeldig velger ut en mann i USA vil det være en 15% sannsynlighet for at han utvikler prostatakreft i løpet av livet" = "b",
@@ -33,6 +48,7 @@ ui <- fluidPage(theme = shinytheme("yeti"),
                                             "Både svaralternativ a og b er riktig" = "d"
                                           )#list
                                         ), #radiobutton
+                                        ), #fontsize
                                         
                                         actionButton("submit", "Sjekk svar"),
                                         br(), br(),
