@@ -6,7 +6,21 @@ library(shinythemes)
 
 #use navigation barns to set the 3-5 questions together
 
-ui <- fluidPage(theme = shinytheme("yeti"),
+ui <- fluidPage(tags$head(
+  tags$style(HTML("
+  body, label, input, button, select {
+      font-family: 'Times New Roman', serif;
+  }
+  
+  h1, h2, h3, h4 {
+      font-family: 'Times New Roman', serif;
+    }
+    
+    .shiny-input-radiogroup label {
+      font-size: 14px;
+    }
+  "))
+), theme = shinytheme("yeti"),
                 navbarPage("Bli en ekspert på statistikkyndighet <3",
                 
                            tabPanel("Spørsmål x",
