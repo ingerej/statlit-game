@@ -4,8 +4,13 @@ library(shiny)
 library(shinytheme)
 
 
-ui <- fluidPage(
-  tags$head(
+
+
+ui <- navbarPage(
+  title = "Bli en ekspert på statistikkyndighet <3",
+  theme = shinytheme("yeti"),
+
+    tags$head(
     tags$style(HTML("
       body, label, input, button, select {
         font-family: 'Times New Roman', serif;
@@ -20,49 +25,46 @@ ui <- fluidPage(
       }
     "))
   ),
-  theme = shinytheme("yeti"),
-  
-  navbarPage("Bli en ekspert på statistikkyndighet <3"),
-             
-             tabPanel("Spørsmål x",
-                      sidebarLayout(
-                        
-                        sidebarPanel(
-                          h5("Deskriptiv statistikk"),
-                          h3("Tolk sannsynlighet i kontekst"),
-                          p("En videregåendelærer var bekymret for om elevene fikk nok søvn. Hun spurte hver elev hvor mye de hadde sovet natten i forveien. Til høyre ser dere oversikten hun laget fra svarene."),
-                          br(), 
-                          p("Hun ønsker å rapportere funnene sine til skolens rektor ved å bruke passente statistisk språk for å beskrive og tolke fordelingen i kontekst. Velg det ", 
-                            tags$b("mest passende"), " utsagnet hun kan bruke for å oppsummere resultatet.")
-                        ),
-                        
-                        mainPanel(
-                          h3("Fordeling av søvntimer"),
-                          plotOutput("sleepPlot", height = "300px",  width = "60%"),
-                          
-                          tags$div(
-                            style = "font-size: 50px;",
-                            radioButtons(
-                              inputId = "svar",
-                              label = tags$h3("Velg et svaralternativ:"),
-                              choices = list(
-                                "Verdiene går fra 3 til 10, hvor de er økende i høyde frem til 7, før dem minker til 10. De fleste verdiene er på 7. Det er et gap mellom 3 og 5. Standardavviket er rundt 2 timer." = "a",
-                                "Timesdistribusjonen av søvn følger en normalkurve og er sentrert ved 7. Det er et gap mellom tre og fem. Studenten som sov 3 timer kan være en uteligger." = "b",
-                                "Timesdistribusjonen av søvn er tilnærmet bell-formet. Typetallet for søvn er 7 timer og standardavviket er rundt 1 time." = "c"
-                              )
-                            )
-                          ),
-                          
-                          actionButton("submit", "Sjekk svar"),
-                          br(),
-                          textOutput("resultat"),
-                          br(),
-                          uiOutput("etter_svar")
-                        )
-                      )
-             )
+
+  tabPanel(
+    "Spørsmål x",
+    sidebarLayout(
+      sidebarPanel(
+        h5("Deskriptiv statistikk"),
+        h3("Tolk sannsynlighet i kontekst"),
+        p("En videregåendelærer var bekymret for om elevene fikk nok søvn. Hun spurte hver elev hvor mye de hadde sovet natten i forveien. Til høyre ser dere oversikten hun laget fra svarene."),
+        br(),
+        p("Hun ønsker å rapportere funnene sine til skolens rektor ved å bruke passende statistisk språk for å beskrive og tolke fordelingen i kontekst. Velg det ",
+          tags$b("mest passende"), " utsagnet hun kan bruke for å oppsummere resultatet.")
+      ),
+
+      mainPanel(
+        h3("Fordeling av søvntimer"),
+        plotOutput("sleepPlot", height = "300px", width = "60%"),
+
+        tags$div(
+          style = "font-size: 50px;",
+          radioButtons(
+            inputId = "svar",
+            label = tags$h3("Velg et svaralternativ:"),
+            choices = list(
+              "Verdiene går fra 3 til 10, hvor de er økende i høyde frem til 7, før dem minker til 10. De fleste verdiene er på 7. Det er et gap mellom 3 og 5. Standardavviket er rundt 2 timer." = "a",
+              "Timesdistribusjonen av søvn følger en normalkurve og er sentrert ved 7. Det er et gap mellom tre og fem. Studenten som sov 3 timer kan være en uteligger." = "b",
+              "Timesdistribusjonen av søvn er tilnærmet bell-formet. Typetallet for søvn er 7 timer og standardavviket er rundt 1 time." = "c"
+            )
+          )
+        ),
+
+        actionButton("submit", "Sjekk svar"),
+        br(),
+        textOutput("resultat"),
+        br(),
+        uiOutput("etter_svar")
+      )
+    )
   )
-             
+)
+
 server <- function(input, output, session) {
   visForklaring <- reactiveVal(FALSE)
   
