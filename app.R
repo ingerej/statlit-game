@@ -1,4 +1,4 @@
-
+#Q14_REALI_v1.0
 
 set.seed(123)
 pop_data <- data.frame(x = rsnorm(1000, mean = 8.5, sd = 1.5, xi = 0.6))
