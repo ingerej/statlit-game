@@ -1,4 +1,6 @@
 #Q4 Pilot REALI
+
+#######CHANGE TXT for forklaring
 library(shiny)
 #histogrammet nå få søylene riktig plassert... og boxplotne må få flere verdier på x-aksen. 
 ui <- fluidPage(
