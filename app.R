@@ -1,4 +1,6 @@
 #question 1 in the Pilot study of REALI
+install.packages("shinytheme")
+library(shinytheme)
 
 
 ui <- fluidPage(
