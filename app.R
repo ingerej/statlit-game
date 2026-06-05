@@ -1,5 +1,6 @@
 #question 1 in the Pilot study of REALI
 
+library(shiny)
 library(shinytheme)
 
 
