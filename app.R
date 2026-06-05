@@ -1,9 +1,5 @@
 #question 1 in the Pilot study of REALI
 
-library(shiny)
-library(shinythemes)
-
-
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
@@ -103,7 +99,7 @@ server <- function(input, output, session) {
     removeModal()
   })
   
-  # 🔹 Plot for "Hours of Sleep"
+  # plot for sleep
   output$sleepPlot <- renderPlot({
     
     # X-verdier i halvtall fra 3 til 10
@@ -128,7 +124,7 @@ server <- function(input, output, session) {
       1   # 10.0
     )
     
-    # Lage punkter
+    # dots
     x <- rep(hours, counts)
     y <- unlist(lapply(counts, function(n) if (n > 0) seq_len(n) else numeric(0)))
     
