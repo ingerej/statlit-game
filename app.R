@@ -17,7 +17,6 @@ ui <- fluidPage(
       }
     "))
   ),
-  theme = shinytheme("yeti"),
   
   navbarPage("Bli en ekspert på statistikkyndighet <3"),
   
