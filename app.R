@@ -1,5 +1,12 @@
 #Q14_REALI_v1.0
 
+library(shiny)
+library(shinyjs)
+library(ggplot2)
+library(plotly)
+library(fGarch)
+
+
 set.seed(123)
 pop_data <- data.frame(x = rsnorm(1000, mean = 8.5, sd = 1.5, xi = 0.6))
 
