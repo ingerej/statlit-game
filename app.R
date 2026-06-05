@@ -91,8 +91,7 @@ server <- function(input, output, session) {
   observeEvent(input$forklaring, {
     showModal(modalDialog(
       title = "Forklaring",
-      "Her er A det mest riktige svaret. A beskriver fordelingen korrekt. 
-       B er feil fordi den påstår normalfordeling, og C er feil fordi SD ikke er 1 time.",
+      "Her er A det mest riktige svaret. A beskriver fordelingen gjennom en median på 7, og med 50% av utvalget mellom 6 og 8, samt en uteligger på 3 timer søvn. B har ikke rett når den sier 50% av utvalget ligger mellom 6.5 og 8. C er feil fordi den ikke markerer uteliggeren, og viser også feil markering av hvor 50% av utvalget ligger.",
       easyClose = TRUE,
       footer = tagList(
         actionButton("lukk", "Lukk forklaring")
