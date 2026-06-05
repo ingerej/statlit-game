@@ -1,14 +1,14 @@
 #question 1 in the Pilot study of REALI
 
 library(shiny)
-library(shinytheme)
+
 
 
 
 
 ui <- navbarPage(
   title = "Bli en ekspert på statistikkyndighet <3",
-  theme = shinytheme("yeti"),
+
 
     tags$head(
     tags$style(HTML("
