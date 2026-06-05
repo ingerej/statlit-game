@@ -1,0 +1,11 @@
+Package: statlitgame
+Type: Shiny
+Title: StatLit Game
+Version: 0.0.1
+Imports:
+    shiny,
+    shinyjs,
+    shinythemes,
+    dplyr,
+    plotly
+Encoding: UTF-8
