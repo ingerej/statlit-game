@@ -2,61 +2,64 @@
 
 #######CHANGE TXT for forklaring
 library(shiny)
-#histogrammet nå få søylene riktig plassert... og boxplotne må få flere verdier på x-aksen. 
-ui <- fluidPage(
-  tags$head(
-    tags$style(HTML("
-      body, label, input, button, select {
-        font-family: 'Times New Roman', serif;
-      }
 
-      h1, h2, h3, h4 {
-        font-family: 'Times New Roman', serif;
-      }
+# ---------- UI ----------
+Q4_Pilot_ui <- function() {
+  tagList(
+    
+    tags$head(
+      tags$style(HTML("
+        body, label, input, button, select {
+          font-family: 'Times New Roman', serif;
+        }
 
-      .shiny-input-radiogroup label {
-        font-size: 14px;
-      }
-    "))
-  ),
-  
-  navbarPage("Bli en ekspert på statistikkyndighet <3"),
-  
-  tabPanel("Spørsmål x",
-           sidebarLayout(
-             
-             sidebarPanel(
-               h5("Deskriptiv statistikk"),
-               h3("Tolk sannsynlighet i kontekst"),
-               p("Grafen til høyre viser timesdistribusjon av søvn forrige natt for en gruppe univeristetsstudenter."),
-               br(),
-               p("Hvilket av de underliggende grafene fremstiller den samme dataen som histogrammet?")
-             ),   
-             
-             mainPanel(
-               h3("Fordeling av søvntimer"),
-               plotOutput("sleepPlot", height = "300px", width = "60%"), 
-               
-               plotOutput("alternativPlot", height = "250px", width = "50%", click = "alternativ_click"),
-               textOutput("valgtPlot"),
-               
-               actionButton("submit", "Sjekk svar"),
-               br(),
-               textOutput("resultat"),
-               br(),
-               uiOutput("etter_svar")
-             )
-           )
+        h1, h2, h3, h4 {
+          font-family: 'Times New Roman', serif;
+        }
+
+        .shiny-input-radiogroup label {
+          font-size: 14px;
+        }
+      "))
+    ),
+    
+    sidebarLayout(
+      
+      sidebarPanel(
+        h5("Deskriptiv statistikk"),
+        h3("Tolk sannsynlighet i kontekst"),
+        p("Grafen til høyre viser timesdistribusjon av søvn forrige natt for en gruppe univeristetsstudenter."),
+        br(),
+        p("Hvilket av de underliggende grafene fremstiller den samme dataen som histogrammet?")
+      ),   
+      
+      mainPanel(
+        h3("Fordeling av søvntimer"),
+        plotOutput("sleepPlot", height = "300px", width = "60%"), 
+        
+        plotOutput("alternativPlot", height = "250px", width = "50%", click = "alternativ_click"),
+        textOutput("valgtPlot"),
+        
+        actionButton("submit", "Sjekk svar"),
+        br(),
+        textOutput("resultat"),
+        br(),
+        uiOutput("etter_svar"),
+        
+        br(),
+        actionButton("next", "Neste spill")  # ✅ viktig
+      )
+    )
   )
-)
+}
 
 
 
-server <- function(input, output, session) {
+# ---------- SERVER ----------
+Q4_Pilot_server <- function(input, output, session) {
   
   visForklaring <- reactiveVal(FALSE)
-  valgtAlternativ <- reactiveVal(NULL)   # <-- lagrer klikket svar
-  
+  valgtAlternativ <- reactiveVal(NULL)
   
   observeEvent(input$submit, {
     
@@ -65,7 +68,7 @@ server <- function(input, output, session) {
       return()
     }
     
-    riktig <- "A"   # <-- sett riktig alternativ her
+    riktig <- "A"
     
     if (valgtAlternativ() == riktig) {
       output$resultat <- renderText("Riktig!")
@@ -80,9 +83,9 @@ server <- function(input, output, session) {
   output$etter_svar <- renderUI({
     if (visForklaring()) {
       div(
-        style = "display: flex; justify-content: left; gap: 20px; margin-top: 10px;",
+        style = "display: flex; gap: 20px;",
         actionButton("forklaring", "Få forklaring"),
-        actionButton("neste", "Neste spørsmål")
+        actionButton("next", "Neste spill")  # ✅ SAMME ID!
       )
     }
   })
@@ -91,13 +94,12 @@ server <- function(input, output, session) {
   observeEvent(input$forklaring, {
     showModal(modalDialog(
       title = "Forklaring",
-      "Her er A det mest riktige svaret. A beskriver fordelingen gjennom en median på 7, og med 50% av utvalget mellom 6 og 8, samt en uteligger på 3 timer søvn. B har ikke rett når den sier 50% av utvalget ligger mellom 6.5 og 8. C er feil fordi den ikke markerer uteliggeren, og viser også feil markering av hvor 50% av utvalget ligger.",
+      "Her er A det mest riktige svaret...",
       easyClose = TRUE,
-      footer = tagList(
-        actionButton("lukk", "Lukk forklaring")
-      )
+      footer = actionButton("lukk", "Lukk forklaring")
     ))
   })
+  
   
   observeEvent(input$lukk, {
     removeModal()
@@ -110,21 +112,11 @@ server <- function(input, output, session) {
     hours  <- seq(3, 10, by = 0.5)
     counts <- c(1,0,0,0,2,4,8,11,17,11,8,6,4,3,1)
     
-    df <- data.frame(
-      hour  = hours,
-      count = counts
-    )
+    df <- data.frame(hour = hours, count = counts)
     
     ggplot(df, aes(x = hour, y = count)) +
-      geom_col(
-        width = 0.5,
-        fill  = "lightblue",
-        color = "black"
-      ) +
-      scale_x_continuous(
-        breaks = 3:10,
-        limits = c(2.75, 10.25)
-      ) +
+      geom_col(width = 0.5, fill = "lightblue", color = "black") +
+      scale_x_continuous(breaks = 3:10, limits = c(2.75, 10.25)) +
       labs(
         x = "Timer med søvn",
         y = "Antall",
@@ -139,11 +131,11 @@ server <- function(input, output, session) {
     
     df <- data.frame(
       gruppe = factor(c("A", "B", "C"), levels = c("C", "B", "A")),
-      ymin   = c(4,   5,   3),
-      lower  = c(6, 6.5,   5),
-      middle = c(7,   7,   7),
-      upper  = c(8,   8,   9),
-      ymax   = c(10, 10,  10)
+      ymin   = c(4, 5, 3),
+      lower  = c(6, 6.5, 5),
+      middle = c(7, 7, 7),
+      upper  = c(8, 8, 9),
+      ymax   = c(10, 10, 10)
     )
     
     outliers <- data.frame(
@@ -166,10 +158,7 @@ server <- function(input, output, session) {
         size  = 2
       ) +
       coord_flip() +
-      scale_y_continuous(
-        breaks = 3:10,        # flere tall langs horisontal akse
-        limits = c(3, 10)
-      ) +
+      scale_y_continuous(breaks = 3:10, limits = c(3, 10)) +
       labs(
         title = "Svaralternativer A, B og C",
         y = "Søvntimer",
@@ -180,6 +169,7 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$alternativ_click, {
+    
     y <- input$alternativ_click$y
     
     valgt <- dplyr::case_when(
@@ -192,5 +182,4 @@ server <- function(input, output, session) {
     output$valgtPlot <- renderText(paste("Du valgte alternativ", valgt))
   })
 }
-
-shinyApp(ui = ui, server = server)
+``
