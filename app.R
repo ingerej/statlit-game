@@ -1,49 +1,44 @@
 library(shiny)
 
-source("games/Q1_Pilot_REALI.R")
-source("games/Q4_Pilot_REALI.R") 
-source("games/Q12_REALI_v2.0.R")
+library(bslib)
+source("./games/Q1_Pilot_REALI.R")
 
-ui <- fluidPage(
-  uiOutput("game_ui")
-)
+hei()
+ui <- page_sidebar()
+  
+  
+  
+  navbarPage(title = "Kjempefin app", tabPanel(sidebarLayout(
+  sidebarPanel(
+    tags$div(
+      style = "font-size: 50px;",
+      radioButtons(
+        inputId = "spill",
+        label = tags$h3("Velg et spill"),
+        choices = list(
+          "Spill 1" = "a",
+          "Spill 2" = "b",
+          "Spill 3" = "c"
+        )
+      )
+    ),
+    actionButton("submit", "Start") 
+  ),
+  mainPanel = h1("test")
+)))
+
+
 
 server <- function(input, output, session) {
-  
-  games_ui <- list(
-    Q1_Pilot_ui, 
-    Q4_Pilot_ui, 
-    Q12_ui
-  )
-  
-  games_server <- list(
-    Q1_Pilot_server, 
-    Q4_Pilot_server, 
-    Q12_ui
-  )
-  
-  current_game_index <- reactiveVal(1)
-  
-  output$game_ui <- renderUI({
-    games_ui[[current_game_index()]]()
-  })
-  
-  # start riktig server
-  observe({
-    games_server[[current_game_index()]](input, output, session)
-  })
-  
-  observeEvent(input$next, {
-    
-    next_index <- current_game_index() + 1
-    
-    if (next_index > length(games_ui)) {
-      next_index <- 1
-    }
-    
-    current_game_index(next_index)
+  observeEvent(input$submit, {
+    if (input$spill == "a") {
+      output$spillet
+    } 
   })
 }
+#
+# current_ui <- Q1_Pilot_ui
+#
+# current_server <- Q1_Pilot_server
 
-shinyApp(ui, server)
-
+shinyApp(ui = ui, server = server)
