@@ -1,6 +1,11 @@
 library(shiny)
 
-library(bslib)
+library(bslib) #gives card as a setup
+
+install.packages("")
+library() #gives namespace in R so the games can be set with the same function, but as a collective thread
+
+
 #source("./games/Q1_Pilot_REALI.R")
 source("./game_template/game_example.R")
 
@@ -8,7 +13,7 @@ source("./game_template/game_example.R")
 ui <- page_sidebar(
   title = "Hvordan bli en statistikkekspert",
   sidebar = sidebar(
-     
+     h3("sett inn brukernavn"), #make log in
         tags$div(
           style = "font-size: 15px;",
           radioButtons(
@@ -24,9 +29,12 @@ ui <- page_sidebar(
         actionButton("submit", "Start")
       
   ), #this is a sidebar with choices which can be sent away
-  card( #this is the main page, card gives a frame
-    card_header("overskrift"), #this is headliner in the card
-    "her er hovedinnholdet" #this gives a body to the card
+  card(
+    #this is the main page, card gives a frame
+    card_header(
+      htmlOutput("card_header_t") 
+    ), #this is a function for headliner in the card collected from a game
+    htmlOutput("card_content")#this gives a body to the card collected from a game
 )
 )
   
@@ -59,9 +67,19 @@ server <- function(input, output, session) {
       output$spillet
     }
     else if (input$spill == "c") {
-      test()
+      output$card_header_t <- renderUI(
+        card_header_test()
+        
+      )
+      output$card_content <- renderUI(
+        card_body_test()
+        
+      )
+      message(test())
     }
   })
+  
+  
 }
 #
 # current_ui <- Q1_Pilot_ui
