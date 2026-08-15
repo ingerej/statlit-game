@@ -1,6 +1,7 @@
 # Q1_Pilot_REALI.R
 #q1 reali pilot i dont know and i hate ai
-Q1_Pilot_ui <- function() {
+library(shiny)
+ui <- function() {
  tagList(
   sidebarLayout(
    sidebarPanel(
@@ -15,13 +16,13 @@ mainPanel(
 
 
 hei <- function() {
-  return("heisann")
+  return("hei")
 }
 
 
 
 
-Q1_Pilot_server <- function(input, output, session) {
+server <- function(input, output, session) {
 
   visForklaring <- reactiveVal(FALSE)
 
@@ -80,4 +81,4 @@ Q1_Pilot_server <- function(input, output, session) {
     box()
   })
 }
-#shinyApp(ui = Q1_Pilot_ui, server = Q1_Pilot_server)
+shinyApp(ui, server)

@@ -126,6 +126,6 @@ server <- function(input, output, session) {
 
 shinyApp(ui = ui, server = server)
 
-install.packages("rsconnect")
-library(rsconnect)
-writeManifest()
+#install.packages("rsconnect")
+#library(rsconnect)
+#writeManifest()

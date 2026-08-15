@@ -182,4 +182,5 @@ Q4_Pilot_server <- function(input, output, session) {
     output$valgtPlot <- renderText(paste("Du valgte alternativ", valgt))
   })
 }
-``
+
+shinyApp(ui, server)

@@ -4,7 +4,7 @@ library(shiny)
 library(shinythemes)
 
 # ---------- UI ----------
-Q12_ui <- function() {
+ui <- function() {
   tagList(
     
     tags$head(
@@ -62,7 +62,7 @@ Q12_ui <- function() {
 
 
 # ---------- SERVER ----------
-Q12_server <- function(input, output, session) {
+server <- function(input, output, session) {
   
   visForklaring <- reactiveVal(FALSE)
   
@@ -100,3 +100,5 @@ Q12_server <- function(input, output, session) {
     removeModal()
   })
 }
+
+shinyApp(ui = ui, server = server)
