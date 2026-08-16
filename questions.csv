@@ -1,7 +1,7 @@
-question_id, game_id, filename
-1, 3,"Q1_Pilot_REALI.R"
-2, 3, "q2.R"
-3, 3, "q3.R"
-4, 4,"Q1_Pilot_REALI.R"
-5, 4, "q5.R"
-6, 4, "q6.R"
+id, game_id, filename
+"question_001", 3,"test_question_structure.R"
+"question_002", 3, "test_question_structure.R"
+"question_003", 3, "test_question_structure.R"
+"question_004", 4,"test_question_structure.R"
+"question_005", 4, "test_question_structure.R"
+"question_006", 4, "test_question_structure.R"
