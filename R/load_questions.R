@@ -1,6 +1,11 @@
 load_question <- function(filepath) {
+  
+  cat("filepath = [", filepath, "]\n", sep = "")
+  4
+  cat("exists = ", file.exists(filepath), "\n", sep = "")
+  
   if (!file.exists(filepath)) {
-    stop("Finner ikke spørsmålsfilen: ", filepath)
+    stop("Finner ikke spørsmålsfilen: ",filepath)
   }
   
   question_environment <- new.env(

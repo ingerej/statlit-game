@@ -76,11 +76,40 @@ question_metadata <- read.csv(
   stringsAsFactors = FALSE
   )
 
+# question_modules <- setNames(
+#   
+#   lapply(
+#     
+#     question_metadata$filename,
+#     
+#     function(filename) {
+#       
+#       
+#       
+#       cat("filename = [", filename, "]\n", sep="")
+#       
+#       
+#       
+#       file_path <- file.path("./games", filename)
+#       
+#       
+#       
+#       cat("filepath = [", file_path, "]\n", sep="")
+#       
+#       
+#       
+#       load_question(file_path)
+#       
+#     }
+#   ),
+#   question_metadata$id
+# )
+
 question_modules <- setNames(
   lapply(
     question_metadata$filename,
     function(filename) {
-      file_path <- file.path("./games", filename)
+      file_path <- file.path("./games",filename)
       load_question(file_path)
     }
   ),
@@ -229,13 +258,51 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  current_question_id <- reactiveVal(NULL)
+  current_game_id <- reactiveVal(NULL)
+  current_question_index <- reactiveVal(NULL)
+  game_results <- reactiveVal(c())
+  
+  finish_game <- function() {
+    results <- game_results()
+    score <- mean(results)
+    showModal(
+      modalDialog(
+        title = "Spillet er ferdig!",
+        paste0(
+          "Du fikk ",
+          round(score * 100),
+          "% riktige svar."
+        ),
+        easyClose = TRUE
+      )
+    )
+  
   observeEvent(input$submit, {
  message("Username: ", input$Username)
     
     users <- read.csv("users.csv")
-    
-    
     current_user <- users[users$username == input$Username, ]
+   
+     if (nrow(current_user) == 0) {
+      new_user <- data.frame(
+     username = input$Username,
+        level = 50
+      )
+
+      users <- rbind(users, new_user)
+      write.csv(
+        users,
+        "users.csv",
+        row.names = FALSE
+        )
+
+      current_level <- 50
+    } 
+    else {
+
+      current_level <- current_user$level
+    }
     current_level <- current_user$level
     
     games <- read.csv("games.csv") 
@@ -257,11 +324,16 @@ server <- function(input, output, session) {
     chosen_questions <- questions[questions$game_id == chosen_game$id, ]
     
     current_question <-  chosen_questions [1, ]
+    current_game_id(chosen_game$id)
+    current_question_index(1)
+    current_question_id(current_question$id)
     
     message(current_question$filename)
     
     filename <- current_question$filename[1]
     file_path <- file.path("./games", filename)
+    
+    
     
     work_in_progress <- load_question(file_path)
     message(work_in_progress)
@@ -269,7 +341,7 @@ server <- function(input, output, session) {
 
     
     file_path
-    source(file_path)
+  #  source(file_path)
     
   
     
@@ -296,17 +368,29 @@ server <- function(input, output, session) {
   names(question_results) <- question_metadata$id
   
   output$question_body <- renderUI({
-    question_id <- req(input$selected_question)
+    
+    
+    
+    question_id <- req(current_question_id())
+    
+    
+    
     question <- question_modules[[question_id]]
     
+    
+    
     tagList(
+      
       h1(question$title),
+      
       question$ui(question_id)
+      
     )
+    
   })
   
   selected_result <- reactive({
-    question_id <- req(input$selected_question)
+    question_id <- req(current_question_id())
     question_results[[question_id]]()
   })
   
@@ -324,19 +408,39 @@ server <- function(input, output, session) {
   
   observeEvent(input$next_question, {
     result <- selected_result()
-    
-    if (!isTRUE(result$solved)) {
-      showNotification(
-        "Du må løse oppgaven før du går videre.",
-        type = "warning"
+    old_results <- game_results()
+    game_results(
+      c(
+        old_results,
+        identical(result$status, "correct")
       )
-      
-      return()
+    )
+    questions <- read.csv(
+      "questions.csv",
+      stringsAsFactors = FALSE
+    )
+    chosen_questions <- questions[
+      questions$game_id == current_game_id(),
+    ]
+    next_index <- current_question_index() + 1
+    
+    if(next_index <= nrow(chosen_questions)) {
+      current_question_index(next_index)
+      current_question_id(
+        chosen_questions$id[next_index]
+      )
+    } else {
+     
+      finish_game()
     }
+      return()
+  }
+  )
+  }
+}
     
     # Hovedappen oppdaterer brukerens nivå,
     # lagrer resultatet og velger neste spørsmål.
-  })
-}
+  
 
 shinyApp(ui, server)
