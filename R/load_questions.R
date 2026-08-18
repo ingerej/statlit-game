@@ -1,7 +1,6 @@
 load_question <- function(filepath) {
   
   cat("filepath = [", filepath, "]\n", sep = "")
-  4
   cat("exists = ", file.exists(filepath), "\n", sep = "")
   
   if (!file.exists(filepath)) {

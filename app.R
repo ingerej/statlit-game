@@ -3,110 +3,18 @@ library(shiny)
 
 library(bslib) #gives card as a setup
 
-#install.packages("")
-#library() #gives namespace in R so the games can be set with the same function, but as a collective thread
+library(tidyverse) #i dont think i use this now-actually. 
 
-
-
-#source("games/Q1_Pilot_REALI.R")
-
-library(tidyverse)
-# users <- read.csv("users.csv")
-# 
-# 
-# current_user <- users[users$username == "user2", ]
-# current_level <- current_user$level
-# 
-# games <- read.csv("games.csv")
-# matching_games <- games[
-#   games$from_level <= current_level & games$to_level >= current_level,
-# ]
-# 
-# chosen_game <- matching_games [
-#   sample.int(nrow(matching_games), 1),
-#   ,
-#   drop = FALSE
-# ]
-# 
-# chosen_game
-# 
-# questions <- read.csv("questions.csv")
-# head(questions)
-# 
-# chosen_questions <- questions[questions$game_id == chosen_game$id, ]
-# 
-# current_question <-  chosen_questions [1, ]
-# filename <- current_question$filename[1]
-# file_path <- file.path("./games", filename)
-# file_pathusers <- read.csv("users.csv")
-# 
-# 
-# current_user <- users[users$username == "user2", ]
-# current_level <- current_user$level
-# 
-# games <- read.csv("games.csv")
-# matching_games <- games[
-#   games$from_level <= current_level & games$to_level >= current_level,
-# ]
-# 
-# chosen_game <- matching_games [
-#   sample.int(nrow(matching_games), 1),
-#   ,
-#   drop = FALSE
-# ]
-# 
-# chosen_game
-# 
-# questions <- read.csv("questions.csv")
-# head(questions)
-# 
-# chosen_questions <- questions[questions$game_id == chosen_game$id, ]
-# 
-# current_question <-  chosen_questions [1, ]
-# filename <- current_question$filename[1]
-# file_path <- file.path("./games", filename)
-# file_path
-# source(file_path)
-
-
-
+#getting/collecting the questions
 source("R/load_questions.R")
 question_metadata <- read.csv(
   "questions.csv", 
   stringsAsFactors = FALSE
   )
 
-# question_modules <- setNames(
-#   
-#   lapply(
-#     
-#     question_metadata$filename,
-#     
-#     function(filename) {
-#       
-#       
-#       
-#       cat("filename = [", filename, "]\n", sep="")
-#       
-#       
-#       
-#       file_path <- file.path("./games", filename)
-#       
-#       
-#       
-#       cat("filepath = [", file_path, "]\n", sep="")
-#       
-#       
-#       
-#       load_question(file_path)
-#       
-#     }
-#   ),
-#   question_metadata$id
-# )
-
+#installing all questions
 question_modules <- setNames(
-  lapply(
+  lapply( #lapply means: do the same for everything
     question_metadata$filename,
     function(filename) {
       file_path <- file.path("./games",filename)
@@ -115,39 +23,7 @@ question_modules <- setNames(
   ),
   question_metadata$id
 )
-# shinyApp(ui, server)
 
-  
-#git addhei()
-# ui <- page_sidebar(
-#   title = "Hvordan bli en statistikkekspert",
-#   sidebar = sidebar(
-#      h3("sett inn brukernavn"), #make log in
-#         tags$div(
-#           style = "font-size: 15px;",
-#           radioButtons(
-#             inputId = "spill",
-#             label = tags$h3("Velg et spill"),
-#             choices = list(
-#               "Level 1" = "1",
-#               "Level 2" = "2",
-#               "Level 3" = "3"
-#             )
-#           )
-#         ),
-#         actionButton("submit", "Start")
-#       
-#   ), #this is a sidebar with choices which can be sent away
-#   card(
-#     #this is the main page, card gives a frame
-#     card_header(
-#       htmlOutput("card_header_t") 
-#     ), #this is a function for headliner in the card collected from a game
-#    # htmlOutput("card_content")#this gives a body to the card collected from a game #removes ("card_content") from this place
-#     htmlOutput(uiOutput("question_body"))
-#    )
-# )
-  
   
 ui <- fluidPage(
   titlePanel("Læringsspill"),
@@ -162,13 +38,6 @@ ui <- fluidPage(
       
       actionButton("submit", "Start"),
       
-      # selectInput(
-      #   "selected_question",
-      #   "Velg spørsmål",
-      #   choices = question_metadata$id
-      # ),
-      # 
-      # hr(),
       
       textOutput("question_status"),
       
@@ -185,84 +54,15 @@ ui <- fluidPage(
 )
 
 
-#
-#    navbarPage(title = "Kjempefin app", tabPanel(sidebarLayout(
-#    sidebarPanel(
-#      tags$div(
-#        style = "font-size: 50px;",
-#        textInput()
-#      ),
-#      actionButton("submit", "Start")
-#    ),
-#    mainPanel = h1("test")
-# )))
-
-
-
-#server <- function(input, output, session) {
- 
-  # observeEvent(input$submit, {
-   # if (input$spill == "1") {
-    #  source("game_template/level_1.R")
-     # output$card_header_t <- renderUI(
-      #  card_header_test()
-        
-      #)
-      #output$card_content <- renderUI(
-       # card_body_test()
-        
-      #)
-      # message(test())
-    #}
-    #else if (input$spill == "2") {
-     # source("game_template/level_2.R")
-      #output$card_header_t <- renderUI(
-       # card_header_test()
-        
-      #)
-      #output$card_content <- renderUI(
-       # card_body_test()
-        
-      #)
-     # message(test())
-    #}
-    #else if (input$spill == "3") {
-     # source("game_template/level_3.R")
-      #output$card_header_t <- renderUI(
-       # card_header_test()
-        
-      #)
-      #output$card_content <- renderUI(
-       # card_body_test()
-        
-    #  )
-    #}
-     # else 
-      #  (output$card_content <- renderUI(
-       # function(){
-        #  return("Ups, dette gikk visst dårlig")
-        #}))
-      # message(test())
-    
-#  })
-  
-  
-#}
-#
-# current_ui <- Q1_Pilot_ui
-#
-# current_server <- Q1_Pilot_server
-
-#shinyApp(ui = ui, server = server)
-
 
 server <- function(input, output, session) {
-  
+  #those under is controlling the game, and making them start on zero when no games has started.
   current_question_id <- reactiveVal(NULL)
   current_game_id <- reactiveVal(NULL)
   current_question_index <- reactiveVal(NULL)
   game_results <- reactiveVal(c())
   
+  #next: popup window for knowing when the game is over, which is- when all the questions sat to that game is played.
   finish_game <- function() {
     results <- game_results()
     score <- mean(results)
@@ -277,21 +77,23 @@ server <- function(input, output, session) {
         easyClose = TRUE
       )
     )
+  }
   
+  #log in and starting the right game
   observeEvent(input$submit, {
  message("Username: ", input$Username)
     
-    users <- read.csv("users.csv")
+    users <- read.csv("users.csv") #check the username with already stored usernames
     current_user <- users[users$username == input$Username, ]
    
-     if (nrow(current_user) == 0) {
+     if (nrow(current_user) == 0) {. #if the username does not exists. Start at 50%
       new_user <- data.frame(
      username = input$Username,
         level = 50
       )
 
       users <- rbind(users, new_user)
-      write.csv(
+      write.csv( #write the new name in the csv file. 
         users,
         "users.csv",
         row.names = FALSE
@@ -301,35 +103,35 @@ server <- function(input, output, session) {
     } 
     else {
 
-      current_level <- current_user$level
+      current_level <- current_user$level #if it does exist- continue
     }
-    current_level <- current_user$level
     
-    games <- read.csv("games.csv") 
+    games <- read.csv("games.csv") #starting a games based on the usernames level
     matching_games <- games[
-      games$from_level <= current_level & games$to_level >= current_level,
+      games$from_level <= current_level & games$to_level >= current_level, #chose the right difficulty for the users level
     ]
     
     chosen_game <- matching_games [
-      sample.int(nrow(matching_games), 1), 
+      sample.int(nrow(matching_games), 1), #pick one of the matching games
       ,
       drop = FALSE
     ]
     
-    message(chosen_game$id)
+    message(chosen_game$id) #give the server the game- it is a check for us to see if it stops before this or not
     
-    questions <- read.csv("questions.csv") 
+    questions <- read.csv("questions.csv")  #read the questions
     head(questions)
     
     chosen_questions <- questions[questions$game_id == chosen_game$id, ]
     
-    current_question <-  chosen_questions [1, ]
+    current_question <-  chosen_questions [1, ] #choose the first question of chosen game
     current_game_id(chosen_game$id)
     current_question_index(1)
     current_question_id(current_question$id)
     
-    message(current_question$filename)
+    message(current_question$filename) #give us the question
     
+    #getting the question to the show-side
     filename <- current_question$filename[1]
     file_path <- file.path("./games", filename)
     
@@ -338,23 +140,17 @@ server <- function(input, output, session) {
     work_in_progress <- load_question(file_path)
     message(work_in_progress)
     
-
-    
     file_path
-  #  source(file_path)
-    
-  
-    
     }
   )
   
-  
-  
+  #under is the start of sending a feedback changing the level over time. But not done yet
   context <- list(
     user_id = reactive("user2"),
     level = reactive(50)
   )
   
+  #results of the question
   question_results <- lapply(
     question_metadata$id,
     function(question_id) {
@@ -367,22 +163,13 @@ server <- function(input, output, session) {
   
   names(question_results) <- question_metadata$id
   
+  #this makes the game show in app.R and not in its own space
   output$question_body <- renderUI({
-    
-    
-    
-    question_id <- req(current_question_id())
-    
-    
-    
+    question_id <- req(current_question_id()) #req- dont start befor you have it. 
+    #what to show
     question <- question_modules[[question_id]]
-    
-    
-    
     tagList(
-      
       h1(question$title),
-      
       question$ui(question_id)
       
     )
@@ -393,7 +180,7 @@ server <- function(input, output, session) {
     question_id <- req(current_question_id())
     question_results[[question_id]]()
   })
-  
+  #text for the questions given in the sidebar
   output$question_status <- renderText({
     result <- selected_result()
     
@@ -406,6 +193,7 @@ server <- function(input, output, session) {
     )
   })
   
+  #buttin: next question, and used later for precentage right
   observeEvent(input$next_question, {
     result <- selected_result()
     old_results <- game_results()
@@ -422,25 +210,33 @@ server <- function(input, output, session) {
     chosen_questions <- questions[
       questions$game_id == current_game_id(),
     ]
-    next_index <- current_question_index() + 1
+    next_index <- current_question_index() + 1 #find the next row
     
+    #is there anymore questions?
     if(next_index <= nrow(chosen_questions)) {
       current_question_index(next_index)
       current_question_id(
         chosen_questions$id[next_index]
-      )
-    } else {
+      ) 
+    } else { #if not: they are done, so the show the window given earlier
      
       finish_game()
     }
       return()
   }
   )
-  }
 }
-    
-    # Hovedappen oppdaterer brukerens nivå,
-    # lagrer resultatet og velger neste spørsmål.
-  
+
+#Later, make the code so the results is getting sent to questions.csv
+
+#Samle statistikk for å se om den virker. Se på resultatene fra de som bruker over tid. Hente klokka når ting starter og slutter, lagre data om hvordan de bruker det. 
+#R kan lage csv over bruken. Ledd det inn i app.R. Tid når bruker starter og stopper, hvor mange ganger bruker er inne. Måle svar, hvor bra bruker skårer, og hvordan dette utvikler seg over tid. 
+#Lage fancy resultatplot over hvordan appen virker for ulike type brukere. ->utifra hvor ofte noen er inne ofte. 
+#Pappas umiddelbare tanker spørsmålene kan kategoriseres i flere typer- prøve å skille ut om noen spørsmål lærer man av fort og noen ikke. Om spørsmål om histogrammer læres raskere enn andre. 
+#Mens spørsmål som er dårligere formulert, vanskeligere å lære av dem. 
+#skal det være passord? Det er ikke så vanskelig å få til. 
+
+
+#
 
 shinyApp(ui, server)
