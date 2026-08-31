@@ -237,6 +237,11 @@ server <- function(input, output, session) {
 #skal det være passord? Det er ikke så vanskelig å få til. 
 
 
-#
+#sette spørsmål om subjektiv vurdering av spørsmålene. "hvor vanskelig synes du spørsmålene var?" Det kan gi bra vurdering til videre. 
+#ved tre spørsmål per spill er en feil 33%. per nå er det jo prosenter -  hard straff ved en feil... annen utregning? 
+#rett mer belønning, men feil svar straffer mindre? 
+
+#åpne nivåer? gi dem valget selv? Vil du høyere dersom du får alle rette eller maks en feil? Gir mer opplevd autonomi over egen utvikling. mer konkurranse? "ansvar for egen læring". 
+
 
 shinyApp(ui, server)

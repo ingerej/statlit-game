@@ -8,7 +8,7 @@ ui <- function() {
     h5("Deskriptiv statistikk")
  ),
 mainPanel(
-   h3("Test")
+   h3("Tester prosjekt")
   )
  )
 )
