@@ -86,7 +86,7 @@ server <- function(input, output, session) {
     users <- read.csv("users.csv") #check the username with already stored usernames
     current_user <- users[users$username == input$Username, ]
    
-     if (nrow(current_user) == 0) {. #if the username does not exists. Start at 50%
+     if (nrow(current_user) == 0) { #if the username does not exists. Start at 50%
       new_user <- data.frame(
      username = input$Username,
         level = 50
@@ -133,7 +133,7 @@ server <- function(input, output, session) {
     
     #getting the question to the show-side
     filename <- current_question$filename[1]
-    file_path <- file.path("./games", filename)
+    file_path <- file.path(".//games", filename)
     
     
     
@@ -234,9 +234,16 @@ server <- function(input, output, session) {
 #Lage fancy resultatplot over hvordan appen virker for ulike type brukere. ->utifra hvor ofte noen er inne ofte. 
 #Pappas umiddelbare tanker spørsmålene kan kategoriseres i flere typer- prøve å skille ut om noen spørsmål lærer man av fort og noen ikke. Om spørsmål om histogrammer læres raskere enn andre. 
 #Mens spørsmål som er dårligere formulert, vanskeligere å lære av dem. 
-#skal det være passord? Det er ikke så vanskelig å få til. 
+#skal det være passord? Det er ikke så vanskelig å få til.
+
+#fint å ha: hvor ofte inne, hvor lang tid de bruker per gang, endre .csv til google for at det skal fungere med shiny-appen
+#få den opp på shiny app, og gjør det om til google sheets.Feedback loop venter. Endre i tråd med Adrian sine tanker.  
+
+#gjøremål: skrives oppgave, vurdere vanskelighetsgrader og sette sammen spørsmålspakker - som har nivå,  
 
 
+
+#Adrian sine tanker
 #sette spørsmål om subjektiv vurdering av spørsmålene. "hvor vanskelig synes du spørsmålene var?" Det kan gi bra vurdering til videre. 
 #ved tre spørsmål per spill er en feil 33%. per nå er det jo prosenter -  hard straff ved en feil... annen utregning? 
 #rett mer belønning, men feil svar straffer mindre? 
