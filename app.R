@@ -3,7 +3,7 @@ library(shiny)
 
 library(bslib) #gives card as a setup
 
-library(tidyverse) #i dont think i use this now-actually. 
+
 
 #getting/collecting the questions
 source("R/load_questions.R")
