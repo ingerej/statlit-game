@@ -3,7 +3,9 @@ library(shiny)
 
 library(bslib) #gives card as a setup
 
+#install.packages("googlesheet4")
 
+library(googlesheets4)
 
 #getting/collecting the questions
 source("R/load_questions.R")
@@ -82,8 +84,13 @@ server <- function(input, output, session) {
   #log in and starting the right game
   observeEvent(input$submit, {
  message("Username: ", input$Username)
+    ?read_sheet
     
-    users <- read.csv("users.csv") #check the username with already stored usernames
+    url <- "https://docs.google.com/spreadsheets/d/1W4sAJIYOhlGTOQnFLhTKImXWy4OV8USSX57P4dm-t_A/edit?gid=0#gid=0" #adress later on
+    
+    #users <- read.csv("users.csv") #check the username with already stored usernames
+    users <- read_sheet(url, 
+                        sheet = "Ark 1")
     current_user <- users[users$username == input$Username, ]
    
      if (nrow(current_user) == 0) { #if the username does not exists. Start at 50%
@@ -93,11 +100,13 @@ server <- function(input, output, session) {
       )
 
       users <- rbind(users, new_user)
-      write.csv( #write the new name in the csv file. 
-        users,
-        "users.csv",
-        row.names = FALSE
-        )
+
+      sheet_write(users, ss = url, sheet = "Ark 1")
+      #write.csv( #write the new name in the csv file. 
+      #  users,
+       # "users.csv",
+        #row.names = FALSE
+        #)
 
       current_level <- 50
     } 
