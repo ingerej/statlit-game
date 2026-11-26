@@ -32,7 +32,10 @@
 # ----------------------------------------------------------------------
 
 # Adresse til brukerarket (samme ark som app.R brukte)
-user_sheet_url <- "https://docs.google.com/spreadsheets/d/1W4sAJIYOhlGTOQnFLhTKImXWy4OV8USSX57P4dm-t_A/edit?gid=0#gid=0"
+user_sheet_url <- Sys.getenv(
+  "USER_SHEET_URL",
+  unset = "https://docs.google.com/spreadsheets/d/1W4sAJIYOhlGTOQnFLhTKImXWy4OV8USSX57P4dm-t_A/edit?gid=0#gid=0"
+)
 user_sheet_tab <- "Ark 1"
 
 # kolonnenavn i arket — endres her hvis arket endres
@@ -99,7 +102,7 @@ load_user <- function(username) {
   
   # gamle nivå-verdier (f.eks. 50 fra 0-100-skalaen) gjelder ikke lenger:
   # behold levels_old i arket, men behandla nivået som uvalgt
-  if (is.na(user$level) || !(user$level %in% c("1", "2", "3"))) {
+  if (is.na(user$level) || !(user$level %in% names(app_content$levels))) {
     user$level <- NA_character_
   }
   
@@ -110,6 +113,9 @@ load_user <- function(username) {
 # Hele arket skrives, så ukjente kolonner (levels_old) bevares som de er.
 save_user <- function(user) {
   users_df <- googlesheets4::read_sheet(user_sheet_url, sheet = user_sheet_tab)
+  if (!(USER_COL_USERNAME %in% names(users_df))) {
+    stop("Brukerarket mangler kolonnen '", USER_COL_USERNAME, "'.")
+  }
   
   # sørg for at alle kolonnene vi bruker finnes i arket
   for (col in c(USER_COL_LEVEL, USER_COL_LESSONS, USER_COL_LEVELS,
@@ -118,31 +124,25 @@ save_user <- function(user) {
   }
   
   row_i <- which(users_df[[USER_COL_USERNAME]] == user$username)
-  
-  if (length(row_i) == 0) {
-    # ny rad — rbind fyller med NA der arket har andre kolonner
-    users_df <- rbind(
-      users_df,
-      data.frame(
-        username           = user$username,
-        level              = user$level,
-        lessons_done       = paste_ids(user$lessons_done),
-        levels_done        = paste_ids(user$levels_done),
-        last_question_done = user$last_question_done,
-        last_seen          = user$last_seen,
-        stringsAsFactors   = FALSE
-      )
-    )
-  } else {
-    users_df[[USER_COL_LEVEL]][row_i]   <- user$level
-    users_df[[USER_COL_LESSONS]][row_i] <- paste_ids(user$lessons_done)
-    users_df[[USER_COL_LEVELS]][row_i]   <- paste_ids(user$levels_done)
-    users_df[[USER_COL_LASTQ]][row_i]   <- user$last_question_done
-    users_df[[USER_COL_SEEN]][row_i]    <- user$last_seen
+  if (length(row_i) > 1) {
+    stop("Flere rader har samme brukernavn. Ingen endringer ble lagret.")
   }
   
+  if (length(row_i) == 0) {
+    # Lag først en tom rad med ALLE arkets kolonner, også levels_old.
+    empty_row <- users_df[NA_integer_, , drop = FALSE]
+    users_df <- rbind(users_df, empty_row)
+    row_i <- nrow(users_df)
+  }
+  users_df[[USER_COL_USERNAME]][row_i] <- user$username
+  users_df[[USER_COL_LEVEL]][row_i]    <- user$level
+  users_df[[USER_COL_LESSONS]][row_i]  <- paste_ids(user$lessons_done)
+  users_df[[USER_COL_LEVELS]][row_i]   <- paste_ids(user$levels_done)
+  users_df[[USER_COL_LASTQ]][row_i]    <- user$last_question_done
+  users_df[[USER_COL_SEEN]][row_i]     <- user$last_seen
+  
   googlesheets4::sheet_write(users_df, ss = user_sheet_url,
-                             sheet = user_sheet_tab)
+                             sheet = user_sheet_tab) #her må koden endres til å bare være individet- range_write
   invisible(user)
 }
 
@@ -182,9 +182,11 @@ complete_lesson <- function(user, lesson_id) {
 }
 
 # fullføre et nivå og gå videre til neste
-advance_level <- function(user) {
-  user$levels_done        <- c(user$levels_done, user$level)
-  user$level              <- as.character(as.numeric(user$level) + 1)
+advance_level <- function(user, content = app_content) {
+  nxt <- next_level_id(content, user$level)
+  if (is.null(nxt)) stop("Det finnes ikke flere nivåer.")
+  user$levels_done        <- unique(c(user$levels_done, user$level))
+  user$level              <- nxt
   user$lessons_done       <- character(0)
   user$last_question_done <- NA_character_
   user$last_seen          <- now_stamp()

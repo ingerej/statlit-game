@@ -16,6 +16,8 @@
 #                  leksjonene skal kjøres på dette nivået.
 #                  Ekstra kolonner blir automatisk felt på nivået
 #                  ("ulik informasjon per nivå").
+#                  Nye level_*.csv-filer i mappa legges automatisk til
+#                  som nye nivåer (se add_discovered_levels).
 #
 #   lessons.csv:   lesson_id, lesson_name
 #
@@ -67,9 +69,51 @@ stop_if_bad_ids <- function(df, col, file_label) {
   }
 }
 
+# ----------------------------------------------------------------------
+# Automatisk oppdagelse av nivåer
+# ----------------------------------------------------------------------
+# Visningsnavn for et nivå: kolonnen 'name' i levels.csv hvis den er
+# fylt ut, ellers hentes navnet fra filnavnet:
+#   level_lett.csv -> "Lett",  level_ekspert.csv -> "Ekspert"
+level_label <- function(name, filename) {
+  lab <- if (length(name) == 1 && !is.na(name) && nzchar(trimws(name))) {
+    trimws(name)
+  } else {
+    sub("^level_", "", tools::file_path_sans_ext(basename(filename)))
+  }
+  paste0(toupper(substring(lab, 1, 1)), substring(lab, 2))
+}
+
+# Finner level_*.csv-filer i mappa som IKKE står i levels.csv, og legger
+# dem til som nye nivåer (etter de eksisterende, alfabetisk). Da holder
+# det å legge en ny fil, f.eks. level_ekspert.csv, ved siden av de andre
+# — uten å røre levels.csv. Skru av med auto_discover = FALSE.
+add_discovered_levels <- function(levels_df, dir = ".",
+                                  pattern = "^level_.*\\.csv$") {
+  files <- sort(list.files(dir, pattern = pattern))
+  new_files <- setdiff(files, as.character(levels_df$filename))
+  if (length(new_files) == 0) return(levels_df)
+  
+  levels_df$level_id <- as.character(levels_df$level_id)
+  ids_num <- suppressWarnings(as.numeric(levels_df$level_id))
+  start <- if (all(is.na(ids_num))) 0 else max(ids_num, na.rm = TRUE)
+  
+  new_df <- levels_df[rep(NA_integer_, length(new_files)), , drop = FALSE]
+  new_df$level_id <- as.character(start + seq_along(new_files))
+  new_df$filename <- new_files
+  new_df$name <- vapply(new_files, function(f) level_label(NA, f), character(1))
+  
+  out <- rbind(levels_df, new_df)
+  rownames(out) <- NULL
+  message("Nye nivåfiler funnet og lagt til: ",
+          paste(new_files, collapse = ", "))
+  out
+}
+
 load_app_content <- function(levels_file   = "levels.csv",
                              lessons_file  = "lessons.csv",
-                             questions_file = "questions.csv") {
+                             questions_file = "questions.csv",
+                             auto_discover  = TRUE) {
   
   levels_df    <- read_content_csv(levels_file)
   lessons_df   <- read_content_csv(lessons_file)
@@ -77,6 +121,7 @@ load_app_content <- function(levels_file   = "levels.csv",
   
   # --- validering: gi tydelig feil FØR koden krasjer kryptisk ---------
   stop_if_missing_cols(levels_df,    c("level_id", "name", "filename"), levels_file)
+  if (auto_discover) levels_df <- add_discovered_levels(levels_df)
   stop_if_missing_cols(lessons_df,   c("lesson_id", "lesson_name"),     lessons_file)
   stop_if_missing_cols(questions_df, c("id", "lesson_id", "filename"), questions_file)
   
@@ -120,6 +165,7 @@ load_app_content <- function(levels_file   = "levels.csv",
     
     lvl <- as.list(levels_df[i, ])      # alle kolonner blir felt
     lvl$level_id <- lvl_id
+    lvl$label    <- level_label(levels_df$name[i], levels_df$filename[i])
     lvl$lessons  <- list()
     
     # les nivåets egen fil (f.eks. level_lett.csv)
@@ -205,6 +251,21 @@ get_question <- function(content, question_id) {
   content$questions[[as.character(question_id)]]
 }
 
+# valg til nivåvelgeren: navngitt vektor, c("Lett" = "1", "Middels" = "2", ...)
+# Bygges fra innholdet, så nye nivåer dukker opp av seg selv.
+level_choices <- function(content) {
+  ids <- names(content$levels)
+  stats::setNames(ids, vapply(ids, function(id) content$levels[[id]]$label,
+                              character(1)))
+}
+
+# id-en til nivået etter dette (NULL hvis dette er det siste)
+next_level_id <- function(content, level_id) {
+  ids <- names(content$levels)
+  pos <- match(as.character(level_id), ids)
+  if (is.na(pos) || pos == length(ids)) NULL else ids[pos + 1]
+}
+
 # neste leksjon på samme nivå (NULL hvis dette var den siste)
 next_lesson <- function(content, level_id, lesson_id) {
   lessons <- get_lessons(content, level_id)
@@ -257,6 +318,8 @@ if (FALSE) {
   get_level_questions(app_content, 1)
   next_lesson(app_content, 1, 1)                       # NULL hvis siste
   lesson_position(app_content, 1, 1)                   # list(pos = 1, total = 6)
+  level_choices(app_content)                           # c(Lett = "1", ...)
+  next_level_id(app_content, 1)                        # "2", NULL hvis siste
   
   # --- filtrere på tvers (via de rå dataene) ----------------------------
   subset(app_content$questions_df, lesson_id == 1)
