@@ -8,8 +8,8 @@ library(googlesheets4)
 
 # NYTT: automatisk innlogging mot Google Sheets med servicekonto
 # (ingen Gmail-godkjenning). Se google_auth.R og docs/google-oppsett.md.
-# source("google_auth.R")
-# init_google_auth()
+source("google_auth.R")
+init_google_auth()
 
 source("user_state.R")
 
